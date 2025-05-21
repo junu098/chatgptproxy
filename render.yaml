@@ -1,1 +1,11 @@
+services:
+  - type: web
+    name: ai-chat-app
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node proxy.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
 
