@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const PORT = process.env.PORT || 3000;
-const fetch = require('node-fetch'); // Important if you're not on Node 18+
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -20,29 +19,21 @@ app.get('/api/chat', async (req, res) => {
 
     try {
         const response = await fetch(`https://nggemini.tiiny.io/?prompt=${encodeURIComponent(userMessage)}`);
-        let text = await response.text();
+        const data = await response.json();
 
-        // Remove HTML tags if any
-        text = text.replace(/<[^>]+>/g, '').trim();
+        // Extract only the reply text
+        const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
-        // Try parsing as JSON to extract clean content
-        try {
-            const json = JSON.parse(text);
-            if (json.content) {
-                return res.send(json.content);
-            }
-        } catch (e) {
-            // Not JSON - send cleaned plain text
-        }
+        if (!replyText) return res.status(502).send('Invalid response from Gemini');
 
-        res.send(text); // fallback to cleaned plain text
+        res.send(replyText); // Return plain text only
     } catch (error) {
         console.error(error);
         res.status(500).send('Proxy error');
     }
 });
 
-// Catch-all route for frontend SPA
+// Catch-all to serve index.html on any unmatched route
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
