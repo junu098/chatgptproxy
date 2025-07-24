@@ -20,7 +20,13 @@ app.get('/api/chat', async (req, res) => {
     try {
         const response = await fetch(`https://nggemini.tiiny.io/?prompt=${encodeURIComponent(userMessage)}`);
         const data = await response.json();
-        res.json(data);
+
+        // Extract only the reply text
+        const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+        if (!replyText) return res.status(502).send('Invalid response from Gemini');
+
+        res.send(replyText); // Return plain text only
     } catch (error) {
         console.error(error);
         res.status(500).send('Proxy error');
