@@ -19,8 +19,8 @@ app.get('/api/chat', async (req, res) => {
 
     try {
         const response = await fetch(`https://nggemini.tiiny.io/?prompt=${encodeURIComponent(userMessage)}`);
-        const text = await response.text();
-        res.send(text);
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
         console.error(error);
         res.status(500).send('Proxy error');
