@@ -18,7 +18,7 @@ app.get('/api/chat', async (req, res) => {
     if (!userMessage) return res.status(400).send('Missing message');
 
     try {
-        const response = await fetch(`https://nggemini.tiiny.io/?chat=${encodeURIComponent(userMessage)}`);
+        const response = await fetch(`https://nggemini.tiiny.io/?prompt=${encodeURIComponent(userMessage)}`);
         const text = await response.text();
         res.send(text);
     } catch (error) {
